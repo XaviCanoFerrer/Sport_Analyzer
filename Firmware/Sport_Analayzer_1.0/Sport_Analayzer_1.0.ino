@@ -802,7 +802,7 @@ void save_sd_card()
      dataFile.print(";");
      dataFile.println(millis());
      dataFile.flush();
-     //dataFile.close();
+     dataFile.close();
    }  
    // if the file isn't open, pop up an error:
    else 
