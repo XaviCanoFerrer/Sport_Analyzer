@@ -16,8 +16,8 @@ unsigned long milliseconds = 10;
 const float ppr = 2400; // Encoder Pulses per revolution
 const float dpr = 360; // Degrees per revolution
 const float mmpp = 0.01; //mm per pulse
-bool rotatiional_flag = false;
-bool linear_flag = true;
+bool rotatiional_flag = true;
+bool linear_flag = false;
 
 // Button variables
 const int buttonPin = 4;
@@ -720,6 +720,8 @@ void setup()
    
   if (dataFile) 
     {
+      dataFile.print("Subject Number");
+      dataFile.print(";");
       dataFile.print("Encoder velocity (mm/s)");
       dataFile.print(";");
       dataFile.print("Load cell force (N)");
@@ -744,12 +746,14 @@ void loop()
     read_push_button();
 
     //Load cell reading
-    load_cell_reading = abs(scale.read());
-
+    //load_cell_reading = abs(scale.read()/500);
+    load_cell_reading = scale.read();
+    
     // Rotational encoder reading
     if (rotatiional_flag == true)
       {
-        s = encoder.read()*dpr/ppr;
+        //s = encoder.read()*dpr/ppr;
+        s = encoder.read();
       }
       
     //Linear Encoder reading
@@ -787,22 +791,24 @@ void loop()
 
 void save_sd_card()
 {
-  //File dataFile = SD.open("data.txt", FILE_WRITE);
+  File dataFile = SD.open("data.txt", FILE_WRITE);
 
-  sprintf(fileName, "%d.txt", count);
-  File dataFile = SD.open(fileName, FILE_WRITE);
+  //sprintf(fileName, "%d.txt", count);
+  //File dataFile = SD.open(fileName, FILE_WRITE);
   
   // if the file is available, write to it:
   if (dataFile) 
    {
      //dataFile.println(dataString);
-     dataFile.print(v);
+     dataFile.print(count);
+     dataFile.print(";");
+     dataFile.print(s);
      dataFile.print(";");
      dataFile.print(load_cell_reading);
      dataFile.print(";");
      dataFile.println(millis());
      dataFile.flush();
-     dataFile.close();
+     //dataFile.close();
    }  
    // if the file isn't open, pop up an error:
    else 
