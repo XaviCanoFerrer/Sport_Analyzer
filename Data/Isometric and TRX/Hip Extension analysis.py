@@ -33,7 +33,7 @@ Fleft = F[5400:7000]
 t1 = tright/np.max(tright)*100
 
 
-# Plot both F right leg and F left leg on the same graph with dF on the secondary axis
+# Plot both F right leg and F left leg on the same graph with F left on the secondary axis
 fig, ax1 = plt.subplots()
 
 color = 'tab:red'
