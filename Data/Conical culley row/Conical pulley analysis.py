@@ -11,7 +11,7 @@ tms = pd.read_excel('Conical.xlsx',usecols="C")
 t = tms/1000;
 a = -1*a_raw*2*math.pi/ppr
 F_raw = np.array(F_raw)
-F = 0.0011*F_raw-4.9839 #Using load cell calibration equation
+F = 0.0011*F_raw-1.248 #Using load cell calibration equation
 #print(len(t))
 
 da = np.gradient(a,axis=0)

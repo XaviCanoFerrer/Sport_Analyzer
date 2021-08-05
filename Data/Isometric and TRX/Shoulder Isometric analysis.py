@@ -1,13 +1,15 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+#plt.style.use('seaborn')
+#plt.style.use('grayscale')
 
 # Import from excel
 F_raw = pd.read_excel('Isometric.xlsx',usecols="B")
 tms = pd.read_excel('Isometric.xlsx',usecols="C")
 t = tms/1000
 F_raw = np.array(F_raw)
-F = 0.0011*F_raw-4.9839 #Using load cell calibration equation
+F = 0.0011*F_raw-1.248 #Using load cell calibration equation
 
 # Plot the results
 plt.plot(F)
@@ -90,11 +92,13 @@ Fright1np = np.array(Fright1)
 Fright2np = np.array(Fright2)
 Fright3np = np.array(Fright3)
 Fright_av = np.arange(start=0, stop=400, step=1)
+#Fright_std = np.arange(start=0, stop=400, step=1)
 
 Fleft1np = np.array(Fleft1)
 Fleft2np = np.array(Fleft2)
 Fleft3np = np.array(Fleft3)
 Fleft_av = np.arange(start=0, stop=400, step=1)
+#Fleft_std = np.arange(start=0, stop=400, step=1)
 
 for i in range(len(cycle)):
     Fright_av[i] = (Fright1np[i]+Fright2np[i]+Fright3np[i])/3
@@ -102,6 +106,7 @@ for i in range(len(cycle)):
 
 for i in range(len(cycle)):
     Fleft_av[i] = (Fleft1np[i]+Fleft2np[i]+Fleft3np[i])/3
+
 
 fig, ax1 = plt.subplots()
 
@@ -118,6 +123,7 @@ ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
 color = 'tab:blue'
 ax2.set_ylabel('Left leg F(N)', color=color)  # we already handled the x-label with ax1
 ax2.plot(cycle, Fleft_av, color=color)
+#plt.errorbar(cycle, Fleft_av, yerr=Ferr, label='both limits (default)')
 ax2.tick_params(axis='y', labelcolor=color)
 
 plt.title('Shoulder External Rotation')
