@@ -807,7 +807,6 @@ void save_sd_card()
      dataFile.print(load_cell_reading);
      dataFile.print(";");
      dataFile.println(millis());
-     //dataFile.flush();
      dataFile.close();
    }  
    // if the file isn't open, pop up an error:
