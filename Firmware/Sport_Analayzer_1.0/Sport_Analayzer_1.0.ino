@@ -16,8 +16,9 @@ unsigned long milliseconds = 10;
 const float ppr = 2400; // Encoder Pulses per revolution
 const float dpr = 360; // Degrees per revolution
 const float mmpp = 0.01; //mm per pulse
-bool rotatiional_flag = true;
-bool linear_flag = false;
+bool rotatiional_flag = false;
+bool linear_flag = true;
+int v_max = 400; // max velocity on y axis of the display
 
 // Button variables
 const int buttonPin = 4;
@@ -29,6 +30,9 @@ unsigned int countPrinted = 0;     // last count printed
 bool state = LOW;
 bool previous_state;
 
+//Second button (Is not in use yet)
+const int buttonPin_2 = 5;
+
 //Maximum number of file names
 char fileName[100];
 
@@ -37,6 +41,8 @@ HX711 scale;
 const int LOADCELL_DOUT_PIN = 2;
 const int LOADCELL_SCK_PIN = 3;
 long load_cell_reading;
+float F;
+const int F_max = 600; //Maximum force on y axis of the display 
 
 // Display variables
 const int chipSelect = 6;
@@ -727,7 +733,7 @@ void setup()
       dataFile.print("Load cell force (N)");
       dataFile.print(";");
       dataFile.println("Time (ms)");
-      dataFile.flush();
+      dataFile.close();
     }  
     // if the file isn't open, pop up an error:
     else 
@@ -748,6 +754,7 @@ void loop()
     //Load cell reading
     //load_cell_reading = abs(scale.read()/500);
     load_cell_reading = scale.read();
+    F = 0.0011*load_cell_reading - 1.248; //Force conversion using the load cell calibration equation
     
     // Rotational encoder reading
     if (rotatiional_flag == true)
@@ -768,20 +775,28 @@ void loop()
     //Calculate the velocity at a certain interval
     if (Interval > milliseconds) 
       {
-        //v = (((s-s_i)*mmpp)/1000)/(float(milliseconds)/1000); // meters per second
-        v = ((s-s_i)*mmpp)/(float(milliseconds)/1000); // mm per second
+        if (rotatiional_flag == true)
+        {
+          v = ((s-s_i)*dpr/ppr)/(float(milliseconds)/1000); // deg per second
+        }
+        if (linear_flag == true)
+        {
+          //v = (((s-s_i)*mmpp)/1000)/(float(milliseconds)/1000); // meters per second
+          v = ((s-s_i)*mmpp)/(float(milliseconds)/1000); // mm per second
+        }
+
         s_i = s;
         Interval = 0;
 
         //Plot the selected sensor on the display
         if (state == 0)
           {
-            Graph(tft, x, v, 30, 240, 320, 240, 0, 320, 100, 0, 400, 100, "", "", "", WHITE, WHITE, BLUE, WHITE, BLACK, display1);
+            Graph(tft, x, v, 30, 240, 320, 240, 0, 320, 100, 0, v_max, 100, "", "", "", WHITE, WHITE, BLUE, WHITE, BLACK, display1);
           }
                 
         if (state == 1)
           {
-            Graph(tft, x, load_cell_reading, 30, 240, 320, 240, 0, 320, 100, 0, 400, 100, "", "", "", WHITE, WHITE, RED, WHITE, BLACK, display1);
+            Graph(tft, x, F, 30, 240, 320, 240, 0, 320, 100, 0, F_max, 100, "", "", "", WHITE, WHITE, RED, WHITE, BLACK, display1);
           }
       }
   }
@@ -802,9 +817,11 @@ void save_sd_card()
      //dataFile.println(dataString);
      dataFile.print(count);
      dataFile.print(";");
-     dataFile.print(s);
+     dataFile.print(s);//Raw data
+     //dataFile.print(v);
      dataFile.print(";");
-     dataFile.print(load_cell_reading);
+     dataFile.print(load_cell_reading);//Raw data
+     //dataFile.print(F);//Force
      dataFile.print(";");
      dataFile.println(millis());
      dataFile.close();
