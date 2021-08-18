@@ -30,8 +30,9 @@ unsigned int countPrinted = 0;     // last count printed
 bool state = LOW;
 bool previous_state;
 
-//Second button (Is not in use yet)
+//Second button to generate new subjects
 const int buttonPin_2 = 5;
+Bounce pushbutton_2 = Bounce(buttonPin_2, 10);  // 10 ms debounce
 
 //Maximum number of file names
 char fileName[100];
@@ -684,6 +685,7 @@ void setup()
   Serial.begin(256000);
 
   pinMode(buttonPin, INPUT_PULLUP);
+  pinMode(buttonPin_2, INPUT_PULLUP);
   
   //Start load cell ADC communication
   scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
@@ -722,7 +724,8 @@ void setup()
 
   // Open the txt. file and add labels on each column
   //File dataFile = SD.open("data.txt", FILE_WRITE);
-  File dataFile = SD.open(fileName, FILE_WRITE);
+  //File dataFile = SD.open(fileName, FILE_WRITE);
+  File dataFile = SD.open("data5.txt", FILE_WRITE);
    
   if (dataFile) 
     {
@@ -750,6 +753,10 @@ void loop()
   {
     //Push button reading
     read_push_button();
+
+    //Read second Push button
+    read_second_push_button();
+
 
     //Load cell reading
     //load_cell_reading = abs(scale.read()/500);
@@ -806,7 +813,7 @@ void loop()
 
 void save_sd_card()
 {
-  File dataFile = SD.open("data.txt", FILE_WRITE);
+  File dataFile = SD.open("data5.txt", FILE_WRITE);
 
   //sprintf(fileName, "%d.txt", count);
   //File dataFile = SD.open(fileName, FILE_WRITE);
@@ -817,11 +824,11 @@ void save_sd_card()
      //dataFile.println(dataString);
      dataFile.print(count);
      dataFile.print(";");
-     dataFile.print(s);//Raw data
-     //dataFile.print(v);
+     //dataFile.print(s);//Raw data
+     dataFile.print(v);
      dataFile.print(";");
-     dataFile.print(load_cell_reading);//Raw data
-     //dataFile.print(F);//Force
+     //dataFile.print(load_cell_reading);//Raw data
+     dataFile.print(F);//Force
      dataFile.print(";");
      dataFile.println(millis());
      dataFile.close();
@@ -835,16 +842,30 @@ void save_sd_card()
 }
 
 
-void read_push_button(){
+void read_push_button()
+{
   if (pushbutton.update()) 
   {
     if (pushbutton.fallingEdge()) 
     {
       state = !state;
+      //count = count + 1;
+    }
+  } 
+}
+
+void read_second_push_button()
+{
+  if (pushbutton_2.update()) 
+  {
+    if (pushbutton_2.fallingEdge()) 
+    {
+      //state = !state;
       count = count + 1;
     }
   } 
 }
+
 void serial_print()
 {
     Serial.print("DATA,TIME,");
